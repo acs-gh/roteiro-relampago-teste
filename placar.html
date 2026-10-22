@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<title>Placar — O Feed vem aí!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#08071A;
+    --surface:rgba(19,17,58,0.85);
+    --surface-alt:rgba(13,11,43,0.9);
+    --border:#2A2560;
+    --purple:#7C3AED;
+    --orange:#FF5E00;
+    --orange-light:#FF8C42;
+    --text:#FFFFFF;
+    --text-secondary:#C4B5FD;
+    --text-tertiary:#9B8EC4;
+    --text-muted:#6B5E9A;
+    --success:#22C55E;
+    --gold:#FFC53D;
+    --silver:#C9D1E0;
+    --bronze:#E08A4B;
+    --font-display:'Outfit', sans-serif;
+    --font-body:'Inter', sans-serif;
+  }
+  :root{ color-scheme: dark; }
+  *{ box-sizing:border-box; }
+  html, body{ height:100%; }
+  body{
+    margin:0;
+    background:var(--bg);
+    background-image:
+      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size:40px 40px;
+    color:var(--text);
+    font-family:var(--font-body);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(255,94,0,0.14), transparent 42%),
+      radial-gradient(circle at 85% 75%, rgba(124,58,237,0.18), transparent 42%);
+  }
+  .wrap{
+    max-width:1500px;
+    margin:0 auto;
+    padding:clamp(16px, 3vw, 40px) clamp(16px, 3vw, 40px) 40px;
+  }
+  header{
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    padding-bottom:clamp(12px, 2vw, 24px);
+    border-bottom:1px solid var(--border);
+    margin-bottom:clamp(16px, 2.5vw, 32px);
+  }
+  .brand{ display:flex; align-items:center; gap:14px; }
+  .brand svg{ width:clamp(30px, 3.5vw, 48px); height:clamp(30px, 3.5vw, 48px); filter:drop-shadow(0 0 8px rgba(255,94,0,0.6)); }
+  .brand h1{
+    font-family:var(--font-display); font-weight:900; margin:0;
+    font-size:clamp(24px, 3.4vw, 46px); color:var(--orange); letter-spacing:.3px; line-height:1.05;
+  }
+  .brand small{ display:block; color:var(--text-tertiary); font-size:clamp(12px, 1.4vw, 18px); margin-top:4px; }
+  .meta{ text-align:right; color:var(--text-muted); font-size:clamp(12px, 1.2vw, 16px); }
+  .meta .live{ display:inline-flex; align-items:center; gap:8px; color:var(--text-secondary); font-family:var(--font-display); font-weight:600; }
+  .dot{ width:10px; height:10px; border-radius:50%; background:var(--success); box-shadow:0 0 10px rgba(34,197,94,.8); animation:pulse 2s infinite; }
+  .dot.off{ background:#EF4444; box-shadow:0 0 10px rgba(239,68,68,.8); animation:none; }
+  @keyframes pulse{ 0%,100%{ opacity:1 } 50%{ opacity:.35 } }
+
+  .latest{
+    background:linear-gradient(135deg, rgba(91,33,182,.55), rgba(124,58,237,.35));
+    border:1px solid var(--purple);
+    border-radius:20px;
+    padding:clamp(14px, 2vw, 26px) clamp(16px, 2.4vw, 32px);
+    margin-bottom:clamp(14px, 2vw, 26px);
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    box-shadow:0 0 30px rgba(124,58,237,.25);
+  }
+  .latest.flash{ animation:flash 2.4s ease; }
+  @keyframes flash{
+    0%{ transform:scale(.97); box-shadow:0 0 0 rgba(255,94,0,0); border-color:var(--orange); }
+    20%{ transform:scale(1.02); box-shadow:0 0 50px rgba(255,94,0,.7); border-color:var(--orange); }
+    100%{ transform:scale(1); box-shadow:0 0 30px rgba(124,58,237,.25); border-color:var(--purple); }
+  }
+  .latest .tag{ font-family:var(--font-display); font-weight:700; font-size:clamp(12px, 1.3vw, 16px); color:var(--orange-light); text-transform:none; margin-bottom:6px; }
+  .latest .who{ font-family:var(--font-display); font-weight:900; font-size:clamp(22px, 3vw, 40px); line-height:1.1; }
+  .latest .who small{ display:block; font-family:var(--font-body); font-weight:500; font-size:clamp(13px, 1.5vw, 20px); color:var(--text-secondary); margin-top:4px; }
+  .latest .res{ text-align:right; }
+  .latest .res .pts{ font-family:var(--font-display); font-weight:900; font-size:clamp(30px, 4.5vw, 64px); color:var(--orange); line-height:1; text-shadow:0 0 24px rgba(255,94,0,.45); }
+  .latest .res .tm{ color:var(--text-secondary); font-size:clamp(13px, 1.5vw, 20px); margin-top:4px; }
+
+  .board{
+    background:var(--surface);
+    backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    border:1px solid var(--border);
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 0 30px rgba(255,94,0,.08);
+  }
+  .board h2{
+    margin:0; padding:clamp(14px, 1.8vw, 24px) clamp(16px, 2.4vw, 32px);
+    font-family:var(--font-display); font-weight:900; font-size:clamp(20px, 2.4vw, 32px);
+    border-bottom:1px solid var(--border);
+  }
+  .row{
+    display:grid;
+    grid-template-columns: clamp(44px, 5vw, 72px) 1fr auto auto;
+    align-items:center; gap:clamp(8px, 1.6vw, 24px);
+    padding:clamp(10px, 1.5vw, 20px) clamp(16px, 2.4vw, 32px);
+    border-bottom:1px solid var(--border);
+    font-size:clamp(15px, 1.9vw, 26px);
+    transition:background .4s ease;
+  }
+  .row:last-child{ border-bottom:none; }
+  .row.me{ background:rgba(255,94,0,.14); }
+  .row .rank{ font-family:var(--font-display); font-weight:900; color:var(--text-muted); font-size:clamp(18px, 2.4vw, 34px); }
+  .row.r1 .rank{ color:var(--gold); text-shadow:0 0 14px rgba(255,197,61,.55); }
+  .row.r2 .rank{ color:var(--silver); }
+  .row.r3 .rank{ color:var(--bronze); }
+  .row .name{ min-width:0; font-weight:600; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .row .name small{ color:var(--text-tertiary); font-weight:500; font-size:.72em; margin-left:8px; }
+  .row .time{ color:var(--text-muted); font-size:.78em; white-space:nowrap; }
+  .row .pts{ font-family:var(--font-display); font-weight:900; color:var(--text); min-width:3.2em; text-align:right; }
+  .empty{ padding:48px 24px; text-align:center; color:var(--text-tertiary); font-size:clamp(16px, 2vw, 24px); }
+
+  footer{ text-align:center; color:var(--text-muted); font-size:12px; margin-top:28px; }
+  @media (max-width:640px){
+    .row{ grid-template-columns:40px 1fr auto; }
+    .row .time{ display:none; }
+    .row .name small{ display:block; margin:2px 0 0; }
+    .latest .res{ text-align:left; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 2L4 14H11L10 22L20 9H13L13 2Z" fill="#FF5E00"/></svg>
+      <div>
+        <h1>O Feed vem aí!</h1>
+        <small>Conecta Imobi — placar ao vivo</small>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="live"><span class="dot" id="dot"></span><span id="status">Carregando...</span></div>
+      <div id="count"></div>
+    </div>
+  </header>
+
+  <section class="latest" id="latest" style="display:none;">
+    <div>
+      <div class="tag">Último jogo</div>
+      <div class="who" id="lastWho"></div>
+    </div>
+    <div class="res">
+      <div class="pts" id="lastPts"></div>
+      <div class="tm" id="lastTime"></div>
+    </div>
+  </section>
+
+  <section class="board">
+    <h2>Top 10</h2>
+    <div id="rows"><div class="empty">Carregando o placar...</div></div>
+  </section>
+
+  <footer>Desempate pelo menor tempo total de resposta. · v1.4</footer>
+</div>
+
+<script>
+/* Endpoint do n8n (GET, sem preflight de CORS). Não expõe telefone nem e-mail. */
+const PLACAR_URL = "https://primary-production-03130.up.railway.app/webhook/roteiro-relampago-placar";
+const REFRESH_MS = 7000;
+
+const $ = (id) => document.getElementById(id);
+let lastSeenId = null;
+let firstLoad = true;
+
+function formatMinSec(totalSeconds){
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = Math.round(totalSeconds - minutes * 60);
+  const adjSeconds = seconds === 60 ? 0 : seconds;
+  const adjMinutes = seconds === 60 ? minutes + 1 : minutes;
+  return adjMinutes + "min " + String(adjSeconds).padStart(2, "0") + "s";
+}
+
+function setOnline(ok){
+  $("dot").classList.toggle("off", !ok);
+  $("status").textContent = ok ? "Ao vivo" : "Reconectando...";
+}
+
+function render(data){
+  const list = data.ranking || [];
+  const ultimo = data.ultimo || null;
+  const box = $("rows");
+  box.innerHTML = "";
+
+  if(list.length === 0){
+    box.innerHTML = '<div class="empty">Ninguém jogou ainda — seja o primeiro!</div>';
+  }
+  list.forEach((e, i) => {
+    const row = document.createElement("div");
+    row.className = "row" + (i < 3 ? " r" + (i + 1) : "") + (ultimo && e.id === ultimo.id ? " me" : "");
+    row.innerHTML = '<span class="rank"></span><span class="name"></span><span class="time"></span><span class="pts"></span>';
+    row.querySelector(".rank").textContent = i + 1;
+    const name = row.querySelector(".name");
+    name.textContent = e.nome;
+    if(e.imobiliaria){
+      const s = document.createElement("small");
+      s.textContent = e.imobiliaria;
+      name.appendChild(s);
+    }
+    row.querySelector(".time").textContent = formatMinSec(e.tempo);
+    row.querySelector(".pts").textContent = e.pontuacao + "/" + e.total;
+    box.appendChild(row);
+  });
+
+  if(ultimo){
+    $("latest").style.display = "flex";
+    const who = $("lastWho");
+    who.textContent = ultimo.nome;
+    if(ultimo.imobiliaria){
+      const s = document.createElement("small");
+      s.textContent = ultimo.imobiliaria;
+      who.appendChild(s);
+    }
+    const pos = list.findIndex(e => e.id === ultimo.id);
+    $("lastPts").textContent = ultimo.pontuacao + "/" + ultimo.total;
+    $("lastTime").textContent = formatMinSec(ultimo.tempo) + (pos >= 0 ? " · " + (pos + 1) + "º lugar" : "");
+    if(!firstLoad && ultimo.id !== lastSeenId){
+      const el = $("latest");
+      el.classList.remove("flash");
+      void el.offsetWidth;
+      el.classList.add("flash");
+    }
+    lastSeenId = ultimo.id;
+  } else {
+    $("latest").style.display = "none";
+  }
+  $("count").textContent = (data.total_partidas || 0) + (data.total_partidas === 1 ? " partida" : " partidas");
+  firstLoad = false;
+}
+
+async function refresh(){
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 8000);
+  try{
+    const r = await fetch(PLACAR_URL + "?t=" + Date.now(), { cache: "no-store", signal: ctrl.signal });
+    if(!r.ok) throw new Error("http " + r.status);
+    render(await r.json());
+    setOnline(true);
+  }catch(e){
+    setOnline(false); // mantém o último placar na tela
+  }finally{
+    clearTimeout(t);
+  }
+}
+
+refresh();
+setInterval(refresh, REFRESH_MS);
+document.addEventListener("visibilitychange", () => { if(!document.hidden) refresh(); });
+</script>
+</body>
+</html>
