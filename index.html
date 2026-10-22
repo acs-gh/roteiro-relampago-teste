@@ -690,7 +690,7 @@
     </div>
   </section>
 
-  <footer class="credit">O Feed vem aí! — protótipo para o laboratório de produtos OLX no Conecta Imobi · Mapa: @svg-maps/brazil (CC BY 4.0) · v1.4</footer>
+  <footer class="credit">O Feed vem aí! — protótipo para o laboratório de produtos OLX no Conecta Imobi · Mapa: @svg-maps/brazil (CC BY 4.0) · v1.5 (teste)</footer>
 </div>
 
 <script>
@@ -913,6 +913,12 @@ function renderQuestion(){
   el("nextBtn").style.display = "none";
   updateProgressBar();
 }
+
+/* Só um vídeo toca por vez: ao começar a tocar um, pausa os outros */
+document.addEventListener("play", e => {
+  if(!(e.target instanceof HTMLVideoElement)) return;
+  document.querySelectorAll("#optionsRow video").forEach(v => { if(v !== e.target && !v.paused) v.pause(); });
+}, true);
 
 function selectOption(key){
   if(state.answered) return;
